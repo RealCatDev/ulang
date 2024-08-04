@@ -3,8 +3,9 @@
 
 // <ERRORS>
 enum {
-  ULANG_UNEXPECTED_TOKEN = 0,
-  ULANG_UNEXPECTED_EOF
+  ULANG_UNEXPECTED_TOKEN = 1,
+  ULANG_UNEXPECTED_EOF,
+  ULANG_TYPE_NOT_FOUND
 };
 // </ERRORS>
 
@@ -24,11 +25,12 @@ ulang_result_t ulang_parser_load(ulang_parser_t *parser, ulang_tokens_t tokens);
 ulang_result_t ulang_parser_loadl(ulang_parser_t *parser, ulang_lexer_t *lexer);
 ulang_result_t ulang_parser_parse(ulang_parser_t *parser,
                                   ulang_ast_program_t *program);
+ulang_result_t ulang_parser_parse_toplevel(ulang_parser_t *parser, ulang_ast_toplevel_t *toplevel);
+ulang_result_t ulang_parser_parse_funcdef(ulang_parser_t *parser, ulang_ast_stmt_func_t *funcdef);
 ulang_result_t ulang_parser_parse_stmt(ulang_parser_t *parser, ulang_ast_stmt_t *stmt);
 ulang_result_t ulang_parser_parse_expr(ulang_parser_t *parser, ulang_ast_expr_t *expr);
 ulang_result_t ulang_parser_parse_scope(ulang_parser_t *parser, ulang_ast_stmt_scope_t *scope);
 ulang_result_t ulang_parser_parse_vardef(ulang_parser_t *parser, ulang_ast_stmt_vardef_t *vardef);
-ulang_result_t ulang_parser_parse_funcdef(ulang_parser_t *parser, ulang_ast_stmt_func_t *funcdef);
 void ulang_parser_free(ulang_parser_t parser);
 
 #endif // ULANG_FRONTEND_PARSER_H_

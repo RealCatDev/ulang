@@ -4,6 +4,7 @@
 typedef ulang_value_t ulang_ast_lit_t;
 typedef struct ulang_ast_expr ulang_ast_expr_t;
 typedef struct ulang_ast_stmt ulang_ast_stmt_t;
+typedef struct ulang_ast_toplevel ulang_ast_toplevel_t;
 typedef struct ulang_ast_program ulang_ast_program_t;
 
 // Expressions
@@ -56,6 +57,22 @@ typedef struct {
   ulang_ast_expr_t *init;
 } ulang_ast_stmt_vardef_t;
 
+struct ulang_ast_stmt {
+  ulang_ast_stmt_kind_t kind;
+  union {
+    ulang_ast_expr_t expr;
+    ulang_ast_stmt_scope_t scope;
+    ulang_ast_stmt_vardef_t vardef;
+  } as;
+};
+
+// Top level
+
+typedef enum {
+  ULANG_AST_TOPLEVEL_FUNCDEF = 0,
+  ULANG_AST_TOPLEVEL_VARDEF,
+} ulang_ast_toplevel_kind_t;
+
 typedef struct {
   Nob_String_View type;
   Nob_String_View name;
@@ -73,24 +90,22 @@ typedef struct {
   ulang_ast_stmt_scope_t body;
 } ulang_ast_stmt_func_t;
 
-struct ulang_ast_stmt {
-  ulang_ast_stmt_kind_t kind;
+struct ulang_ast_toplevel {
+  ulang_ast_toplevel_kind_t kind;
   union {
-    ulang_ast_expr_t expr;
-    ulang_ast_stmt_scope_t scope;
+    ulang_ast_stmt_func_t funcdef;
     ulang_ast_stmt_vardef_t vardef;
-    ulang_ast_stmt_func_t func;
   } as;
 };
 
 typedef struct {
-  ulang_ast_stmt_t *items;
+  ulang_ast_toplevel_t *items;
   size_t count;
   size_t capacity;
-} ulang_ast_stmts_t;
+} ulang_ast_toplevels_t;
 
 struct ulang_ast_program {
-  ulang_ast_stmts_t body;
+  ulang_ast_toplevels_t body;
 };
 
 #endif // ULANG_FRONTEND_AST_
