@@ -5,7 +5,8 @@
 enum {
   ULANG_UNEXPECTED_TOKEN = 1,
   ULANG_UNEXPECTED_EOF,
-  ULANG_TYPE_NOT_FOUND
+  ULANG_TYPE_NOT_FOUND,
+  ULANG_VARIABLE_REDEFINITION
 };
 // </ERRORS>
 
@@ -16,9 +17,16 @@ typedef struct {
 } ulang_types_t;
 
 typedef struct {
+  ulang_variable_t *items;
+  size_t count;
+  size_t capacity;
+} ulang_variables_t;
+
+typedef struct {
   ulang_tokens_t tokens;
   ulang_token_t *ptr;
   ulang_types_t types;
+  ulang_variables_t variables;
 } ulang_parser_t;
 
 ulang_result_t ulang_parser_load(ulang_parser_t *parser, ulang_tokens_t tokens);

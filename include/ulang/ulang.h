@@ -11,6 +11,7 @@
 #define SV(str) (Nob_String_View){ .data = str, .count = sizeof(str)-1 }
 
 #include "ulang/type.h"
+#include "ulang/variable.h"
 #include "ulang/value.h"
 #include "ulang/errors.h"
 #include "ulang/frontend/lexer.h"

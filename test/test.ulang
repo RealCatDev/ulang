@@ -1,4 +1,4 @@
-int meh = 0;
+int var = 0;
 func main() {
-  int meh = 0;
+  int var = 0;
 }

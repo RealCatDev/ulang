@@ -6,6 +6,17 @@ bool ulang_parser_is_type(ulang_parser_t *parser, Nob_String_View name, ulang_ty
   return false;
 }
 
+bool ulang_parser_is_variable_taken(ulang_parser_t *parser, Nob_String_View name, ulang_variable_t *var) {
+  for (size_t i = 0; i < parser->variables.count; ++i) {
+    ulang_variable_t variable = parser->variables.items[i];
+    if (nob_sv_eq(variable.name, name)) {
+      if (var) *var = variable;
+      return true;
+    }
+  }
+  return false;
+}
+
 bool ulang_parser_peek(ulang_parser_t *parser, size_t offset, ulang_token_t *token) {
   if (parser->ptr-parser->tokens.items+offset >= parser->tokens.count) return false;
   if (token) *token = *(parser->ptr+offset);
@@ -66,7 +77,7 @@ ulang_result_t ulang_parser_loadl(ulang_parser_t *parser, ulang_lexer_t *lexer) 
 ulang_result_t ulang_parser_parse(ulang_parser_t *parser, ulang_ast_program_t *program) {
   ulang_location_t location = {0};
 
-  while (parser->tokens.items-parser->ptr < parser->tokens.count) {
+  while (parser->ptr-parser->tokens.items < parser->tokens.count) {
     ulang_ast_toplevel_t toplevel = {0};
     ulang_result_t result = {0};
     if ((result = ulang_parser_parse_toplevel(parser, &toplevel)).kind != ULANG_SUCCESS) return result;
@@ -265,6 +276,11 @@ ulang_result_t ulang_parser_parse_vardef(ulang_parser_t *parser, ulang_ast_stmt_
   };
   if ((result = ulang_parser_eat(parser, ULANG_TOKEN_ID, &name_tok)).kind != ULANG_SUCCESS) return result;
 
+  if (ulang_parser_is_variable_taken(parser, name_tok.value.as.string, NULL)) return (ulang_result_t){
+    .kind = ULANG_PACK_RESULT_KIND(ULANG_PARSER_ERROR, ULANG_VARIABLE_REDEFINITION),
+    .location = type_tok.location
+  };
+
   ulang_token_t tok = {0};
   if (!ulang_parser_peek(parser, 0, &tok) || !ulang_parser_advance(parser, NULL)) return (ulang_result_t){
     .kind = ULANG_PACK_RESULT_KIND(ULANG_PARSER_ERROR, ULANG_UNEXPECTED_EOF)
@@ -278,13 +294,20 @@ ulang_result_t ulang_parser_parse_vardef(ulang_parser_t *parser, ulang_ast_stmt_
   if (tok.kind == '=') {
     vardef->init = malloc(sizeof(*vardef->init));
     if ((result = ulang_parser_parse_expr(parser, vardef->init)).kind != ULANG_SUCCESS) return result;
-    result = ulang_parser_eat(parser, ';', NULL);
   } else if (tok.kind != ';') {
     return (ulang_result_t){
       .kind = ULANG_PACK_RESULT_KIND(ULANG_PARSER_ERROR, ULANG_UNEXPECTED_TOKEN),
       .location = tok.location
     };
   }
+
+  if ((result = ulang_parser_eat(parser, ';', NULL)).kind != ULANG_SUCCESS) return result;
+
+  ulang_variable_t variable = (ulang_variable_t){
+    .name = vardef->name,
+    .type = vardef->type
+  };
+  nob_da_append(&parser->variables, variable);
 
   return result;
 }
