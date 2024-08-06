@@ -1,4 +1,4 @@
 int var = 0;
-func main() {
-  int var = 0;
+func main(int meh) {
+  int meow = 0;
 }

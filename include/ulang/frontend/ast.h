@@ -1,6 +1,7 @@
 #ifndef   ULANG_FRONTEND_AST_
 #define   ULANG_FRONTEND_AST_
 
+typedef size_t ulang_ast_lit_handle_t;
 typedef ulang_value_t ulang_ast_lit_t;
 typedef struct ulang_ast_expr ulang_ast_expr_t;
 typedef struct ulang_ast_stmt ulang_ast_stmt_t;
@@ -28,7 +29,7 @@ typedef Nob_String_View ulang_ast_expr_var_t;
 struct ulang_ast_expr {
   ulang_ast_expr_kind_t kind;
   union {
-    ulang_ast_lit_t literal;
+    ulang_ast_lit_handle_t literal;
     ulang_ast_expr_t *paren;
     ulang_ast_expr_binop_t bin_op;
     ulang_ast_expr_var_t var;
@@ -53,7 +54,7 @@ typedef struct {
 
 typedef struct {
   Nob_String_View name;
-  ulang_type_t type;
+  size_t type; // Type handle
   ulang_ast_expr_t *init;
 } ulang_ast_stmt_vardef_t;
 
@@ -74,7 +75,7 @@ typedef enum {
 } ulang_ast_toplevel_kind_t;
 
 typedef struct {
-  Nob_String_View type;
+  size_t type; // Type index
   Nob_String_View name;
 } ulang_func_param_t;
 
@@ -85,6 +86,8 @@ typedef struct {
 } ulang_func_params_t;
 
 typedef struct {
+  bool has_type;
+  size_t type;
   Nob_String_View name;
   ulang_func_params_t params;
   ulang_ast_stmt_scope_t body;
@@ -104,8 +107,22 @@ typedef struct {
   size_t capacity;
 } ulang_ast_toplevels_t;
 
+typedef struct {
+  ulang_ast_lit_t *items;
+  size_t count;
+  size_t capacity;
+} ulang_literals_t;
+
+typedef struct {
+  ulang_type_t *items;
+  size_t count;
+  size_t capacity;
+} ulang_types_t;
+
 struct ulang_ast_program {
   ulang_ast_toplevels_t body;
+  ulang_literals_t literals;
+  ulang_types_t types;
 };
 
 #endif // ULANG_FRONTEND_AST_

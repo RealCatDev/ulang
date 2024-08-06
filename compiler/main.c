@@ -9,9 +9,13 @@ int main(int argc, char **argv) {
   ulang_parser_t parser = {0};
   if ((result = ulang_parser_loadl(&parser, &lexer)).kind != ULANG_SUCCESS) return 1;
 
-  ulang_ast_program_t program = {0};
-  if ((result = ulang_parser_parse(&parser, &program)).kind != ULANG_SUCCESS) return 1;
+  ulang_codegen_t codegen = {0};
+  if ((result = ulang_codegen_init(&codegen, ULANG_CODEGEN_BYTECODE, &parser)).kind != ULANG_SUCCESS) return 1;
+  if ((result = ulang_codegen_gen(&codegen)).kind != ULANG_SUCCESS) return 1;
+  if ((result = ulang_codegen_save(&codegen, "../test/test.ubyte")).kind != ULANG_SUCCESS) return 1;
 
+  ulang_codegen_free(codegen);
+  ulang_parser_free(parser);
   ulang_lexer_free(lexer);
 
   return 0;

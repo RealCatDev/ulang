@@ -15,6 +15,7 @@ enum {
   ULANG_FS_ERROR,
   ULANG_LEXER_ERROR,
   ULANG_PARSER_ERROR,
+  ULANG_CODEGEN_ERROR,
 };
 
 typedef struct {

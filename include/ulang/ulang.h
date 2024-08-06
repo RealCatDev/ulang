@@ -17,5 +17,7 @@
 #include "ulang/frontend/lexer.h"
 #include "ulang/frontend/ast.h"
 #include "ulang/frontend/parser.h"
+#include "ulang/frontend/codegen.h"
+#include "ulang/backend/vm.h"
 
 #endif // ULANG_ULANG_H_
